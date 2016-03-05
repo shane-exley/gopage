@@ -1,0 +1,67 @@
+package gopage
+
+import (
+	"errors"
+	"reflect"
+)
+
+//DefaultPageSize default size of a page applicable if one is not manually set.
+//Its value is 10.
+const DefaultPageSize = 10
+
+//Paginator the primary struct around which all methods are planned
+//This struct's instance hold the actual slice data and its meta information. alongwith the pagination options.
+type Paginator struct {
+	payloadSlice []interface{}
+	payloadLen   int
+	pageSize     int
+}
+
+//ErrNotSlice is returned when the constructor is passed an item which is not a slice.
+var ErrNotSlice error = errors.New("Input not a slice")
+
+//ErrinvalidPageSize is returned when the SetPageSize method is passed a non-positive integer
+var ErrInvalidPageSize error = errors.New("Page size not a positive integer")
+
+//ErrOverflow is returned when the requested page lies beyond the size of the slice
+var ErrOverflow error = errors.New("Page out of bounds of slice")
+
+//NewPaginator This function creates a new instance of the Paginator struct. It sets the default
+//page size which can be changed later.
+func NewPaginator(payload interface{}) (*Paginator, error) {
+	s := reflect.ValueOf(payload)
+	if s.Kind() != reflect.Slice {
+		return nil, ErrNotSlice
+	}
+
+	payloadS := make([]interface{}, s.Len())
+	for i := 0; i < s.Len(); i++ {
+		payloadS[i] = s.Index(i).Interface()
+	}
+
+	return &Paginator{payloadSlice: payloadS, pageSize: DefaultPageSize, payloadLen: s.Len()}, nil
+}
+
+//SetPageSize This method sets the page size for the paged retrival of the slice.
+func (p *Paginator) SetPageSize(s int) error {
+	if s <= 0 {
+		return ErrInvalidPageSize
+	}
+	p.pageSize = s
+	return nil
+}
+
+//Page This method returns the snapshot of the slice on the ith page.
+func (p *Paginator) Page(i int) ([]interface{}, error) {
+	start := (i - 1) * p.pageSize
+	end := i * p.pageSize
+
+	if start >= p.payloadLen {
+		return nil, ErrOverflow
+	} else if end > p.payloadLen {
+		return p.payloadSlice[start:], nil
+	}
+
+	return p.payloadSlice[start:end], nil
+
+}
