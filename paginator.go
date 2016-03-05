@@ -51,6 +51,11 @@ func (p *Paginator) SetPageSize(s int) error {
 	return nil
 }
 
+//GetPageSize This method returns the page size of a Paginator
+func (p *Paginator) GetPageSize() int {
+	return p.pageSize
+}
+
 //Page This method returns the snapshot of the slice on the ith page.
 func (p *Paginator) Page(i int) ([]interface{}, error) {
 	start := (i - 1) * p.pageSize
