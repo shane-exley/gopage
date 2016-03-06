@@ -44,4 +44,11 @@ func TestNewPaginator(t *testing.T) {
 	assert.NotNil(t, errd)
 	assert.Equal(t, errd, ErrNotSlice)
 	assert.Nil(t, d)
+
+	e, erre := p.Fetch(0, 1)
+	assert.Nil(t, erre)
+	a, ok := e.([]int)
+	assert.True(t, ok)
+	assert.NotNil(t, a)
+	assert.Equal(t, len(a), 1)
 }

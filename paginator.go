@@ -64,3 +64,17 @@ func (p *Paginator) Page(i int) (interface{}, error) {
 
 	return p.payloadSlice.Slice(start, end).Interface(), nil
 }
+
+//Fetch It returns the slice for the given offset and limit
+func (p *Paginator) Fetch(offset int, limit int) (interface{}, error) {
+	start := offset
+	end := offset + limit
+
+	if start >= p.payloadLen {
+		return nil, ErrOverflow
+	} else if end > p.payloadLen {
+		return p.payloadSlice.Slice(start, p.payloadLen).Interface(), nil
+	}
+
+	return p.payloadSlice.Slice(start, end).Interface(), nil
+}
