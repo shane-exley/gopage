@@ -13,10 +13,10 @@ func TestNewPaginator(t *testing.T) {
 
 	sl, errsl := p.Page(1)
 	assert.Nil(t, errsl)
-	assert.NotEqual(t, len(sl), 0)
-	assert.Equal(t, len(sl), 4)
-	for i, s := range sl {
-		assert.Equal(t, s.(int), source[i])
+	assert.NotEqual(t, len(sl.([]int)), 0)
+	assert.Equal(t, len(sl.([]int)), 4)
+	for i, s := range sl.([]int) {
+		assert.Equal(t, s, source[i])
 	}
 
 	errps := p.SetPageSize(2)
@@ -24,10 +24,10 @@ func TestNewPaginator(t *testing.T) {
 	assert.Equal(t, p.GetPageSize(), 2)
 	sl, errsl = p.Page(1)
 	assert.Nil(t, errsl)
-	assert.NotEqual(t, len(sl), 0)
-	assert.Equal(t, len(sl), 2)
-	for i, s := range sl {
-		assert.Equal(t, s.(int), source[i])
+	assert.NotEqual(t, len(sl.([]int)), 0)
+	assert.Equal(t, len(sl.([]int)), 2)
+	for i, s := range sl.([]int) {
+		assert.Equal(t, s, source[i])
 	}
 
 	errps = p.SetPageSize(-10)
@@ -38,7 +38,6 @@ func TestNewPaginator(t *testing.T) {
 
 	sl, errsl = p.Page(3)
 	assert.Equal(t, errsl, ErrOverflow)
-	assert.Equal(t, len(sl), 0)
 	assert.Nil(t, sl)
 
 	d, errd := NewPaginator(1234)

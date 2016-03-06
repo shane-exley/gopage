@@ -22,7 +22,7 @@ func (i *Iterator) GetCursorPosition() int {
 }
 
 //Next Gets the Next Page. Also moves the cursor position position ahead.
-func (i *Iterator) Next() ([]interface{}, error) {
+func (i *Iterator) Next() (interface{}, error) {
 	i.mux.Lock()
 	defer i.mux.Unlock()
 
@@ -31,7 +31,7 @@ func (i *Iterator) Next() ([]interface{}, error) {
 }
 
 //Prev Gets the previous page. Also takes the cursor back
-func (i *Iterator) Prev() ([]interface{}, error) {
+func (i *Iterator) Prev() (interface{}, error) {
 	i.mux.Lock()
 	defer i.mux.Unlock()
 
@@ -40,6 +40,6 @@ func (i *Iterator) Prev() ([]interface{}, error) {
 }
 
 //Peek Gets the next page without moving the cursor position ahead
-func (i *Iterator) Peek() ([]interface{}, error) {
+func (i *Iterator) Peek() (interface{}, error) {
 	return i.paginator.Page(i.pageCount)
 }

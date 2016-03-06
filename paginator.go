@@ -12,7 +12,7 @@ const DefaultPageSize = 10
 //Paginator the primary struct around which all methods are planned
 //This struct's instance hold the actual slice data and its meta information. alongwith the pagination options.
 type Paginator struct {
-	payloadSlice []interface{}
+	payloadSlice reflect.Value
 	payloadLen   int
 	pageSize     int
 }
@@ -34,12 +34,7 @@ func NewPaginator(payload interface{}) (*Paginator, error) {
 		return nil, ErrNotSlice
 	}
 
-	payloadS := make([]interface{}, s.Len())
-	for i := 0; i < s.Len(); i++ {
-		payloadS[i] = s.Index(i).Interface()
-	}
-
-	return &Paginator{payloadSlice: payloadS, pageSize: DefaultPageSize, payloadLen: s.Len()}, nil
+	return &Paginator{payloadSlice: s, pageSize: DefaultPageSize, payloadLen: s.Len()}, nil
 }
 
 //SetPageSize This method sets the page size for the paged retrival of the slice.
@@ -57,16 +52,15 @@ func (p *Paginator) GetPageSize() int {
 }
 
 //Page This method returns the snapshot of the slice on the ith page.
-func (p *Paginator) Page(i int) ([]interface{}, error) {
+func (p *Paginator) Page(i int) (interface{}, error) {
 	start := (i - 1) * p.pageSize
 	end := i * p.pageSize
 
 	if start >= p.payloadLen {
 		return nil, ErrOverflow
 	} else if end > p.payloadLen {
-		return p.payloadSlice[start:], nil
+		return p.payloadSlice.Slice(start, p.payloadLen).Interface(), nil
 	}
 
-	return p.payloadSlice[start:end], nil
-
+	return p.payloadSlice.Slice(start, end).Interface(), nil
 }
