@@ -9,6 +9,14 @@ import (
 //Its value is 10.
 const DefaultPageSize = 10
 
+//PageFetcher defines the method for the interface
+type PageFetcher interface {
+	Page(i int) (interface{}, error)
+	Fetch(offset int, limit int) (interface{}, error)
+	SetPageSize(s int) error
+	GetPageSize() int
+}
+
 //Paginator the primary struct around which all methods are planned
 //This struct's instance hold the actual slice data and its meta information. alongwith the pagination options.
 type Paginator struct {
@@ -28,7 +36,7 @@ var ErrOverflow error = errors.New("Page out of bounds of slice")
 
 //NewPaginator This function creates a new instance of the Paginator struct. It sets the default
 //page size which can be changed later.
-func NewPaginator(payload interface{}) (*Paginator, error) {
+func NewPaginator(payload interface{}) (PageFetcher, error) {
 	s := reflect.ValueOf(payload)
 	if s.Kind() != reflect.Slice {
 		return nil, ErrNotSlice
