@@ -1,5 +1,6 @@
-# go-paginator
-Pagination API for golang slices
+# go-paginator 
+
+Pagination API for golang slices [![Circle CI](https://circleci.com/gh/goibibo/gopage.png?style=badge)](https://github.com/goibibo/gopage)
 
 #Example
 ```golang
