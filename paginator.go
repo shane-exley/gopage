@@ -2,6 +2,7 @@ package gopage
 
 import (
 	"errors"
+	"math"
 	"reflect"
 )
 
@@ -15,6 +16,7 @@ type PageFetcher interface {
 	Fetch(offset int, limit int) (interface{}, error)
 	SetPageSize(s int) error
 	GetPageSize() int
+	GetPageCount() int
 }
 
 //Paginator the primary struct around which all methods are planned
@@ -23,6 +25,7 @@ type Paginator struct {
 	payloadSlice reflect.Value
 	payloadLen   int
 	pageSize     int
+	pageCount    int
 }
 
 //ErrNotSlice is returned when the constructor is passed an item which is not a slice.
@@ -42,7 +45,9 @@ func NewPaginator(payload interface{}) (PageFetcher, error) {
 		return nil, ErrNotSlice
 	}
 
-	return &Paginator{payloadSlice: s, pageSize: DefaultPageSize, payloadLen: s.Len()}, nil
+	pc := math.Ceil(float64(s.Len()) / float64(DefaultPageSize))
+
+	return &Paginator{payloadSlice: s, pageSize: DefaultPageSize, payloadLen: s.Len(), pageCount: int(pc)}, nil
 }
 
 //SetPageSize This method sets the page size for the paged retrival of the slice.
@@ -51,12 +56,21 @@ func (p *Paginator) SetPageSize(s int) error {
 		return ErrInvalidPageSize
 	}
 	p.pageSize = s
+
+	pc := math.Ceil(float64(p.payloadLen) / float64(s))
+	p.pageCount = int(pc)
+
 	return nil
 }
 
 //GetPageSize This method returns the page size of a Paginator
 func (p *Paginator) GetPageSize() int {
 	return p.pageSize
+}
+
+//GetPageCount This method returns the number of pages of a Paginator
+func (p *Paginator) GetPageCount() int {
+	return p.pageCount
 }
 
 //Page This method returns the snapshot of the slice on the ith page.
